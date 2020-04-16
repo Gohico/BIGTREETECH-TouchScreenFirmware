@@ -60,6 +60,7 @@
 //menu
 #include "menu.h"
 #include "MainPage.h"
+#include "JobSetup.h"
 #include "PreheatMenu.h"
 #include "Heat.h"
 #include "Move.h"
