@@ -186,7 +186,9 @@
 #define EN_ST7920_FULLSCREEN "Marlin mode in fullscreen"
 
 //Custom
+#define EN_POS "PoS"
 #define EN_JOBSETUP "Job setup"
+#define EN_ROTATE "Rotate"
 #define EN_HOME_X "X = 0"
 #define EN_HOME_Y "Y = 0"
 #define EN_HOME_Z "Z = 0"

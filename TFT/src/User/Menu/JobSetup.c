@@ -1,8 +1,6 @@
 #include "JobSetup.h"
 #include "includes.h"
 
-KEY_VALUES key_num = KEY_IDLE;
-
 #define X_HOME_GCODE "G92 X0\n"
 #define Y_HOME_GCODE "G92 Y0\n"
 #define Z_HOME_GCODE "G92 Z0\n"
@@ -14,10 +12,10 @@ const MENUITEMS jobSetupItems = {
     LABEL_JOBSETUP,
     // icon                       label
     {
+        {ICON_HOME, LABEL_HOME},
         {ICON_JOBSETUPX, LABEL_HOME_X},
         {ICON_JOBSETUPX, LABEL_HOME_Y},
         {ICON_JOBSETUPZ, LABEL_HOME_Z},
-        {ICON_BACKGROUND, LABEL_BACKGROUND},
         {ICON_JOBSETUPALL, LABEL_HOME_ALL},
         {ICON_BACKGROUND, LABEL_BACKGROUND},
         {ICON_BACKGROUND, LABEL_BACKGROUND},
@@ -26,7 +24,10 @@ const MENUITEMS jobSetupItems = {
 
 void menuJobSetup(void)
 {
+    KEY_VALUES key_num = KEY_IDLE;
+
     menuDrawPage(&jobSetupItems);
+    drawXYZ();
 
     while (infoMenu.menu[infoMenu.cur] == menuJobSetup)
     {
@@ -34,19 +35,20 @@ void menuJobSetup(void)
         switch (key_num)
         {
         case KEY_ICON_0:
-            jobSetupCmd(X_AXIS);
+            storeCmd("G28\n");
             break;
         case KEY_ICON_1:
-            jobSetupCmd(Y_AXIS);
+            jobSetupCmd(X_AXIS);
             break;
         case KEY_ICON_2:
+            jobSetupCmd(Y_AXIS);
+            break;
+        case KEY_ICON_3:
             jobSetupCmd(Z_AXIS);
             break;
-
-        case KEY_ICON_4:
+        case KEY_ICON_5:
             jobSetupCmd(TOTAL_AXIS);
             break;
-
         case KEY_ICON_7:
             infoMenu.cur--;
             break;
@@ -55,6 +57,7 @@ void menuJobSetup(void)
             break;
         }
         loopProcess();
+        update_gantry();
     }
 }
 

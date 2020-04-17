@@ -7,27 +7,27 @@ const MENUITEMS StatusItems = {
     LABEL_READY,
     // icon                       label
     {
-        {ICON_STATUSNOZZLE, LABEL_BACKGROUND},
-        {ICON_STATUSJOBSETUP, LABEL_BACKGROUND},
-        {ICON_STATUSFAN, LABEL_BACKGROUND},
-        {ICON_STATUS_SPEED, LABEL_BACKGROUND},
-        {ICON_MAINMENU, LABEL_MAINMENU},
+        {ICON_MOVE, LABEL_BACKGROUND}, //was ICON_STATUSNOZZLE ICON_HOME
+        {ICON_JOBSETUP, LABEL_BACKGROUND},
+        {ICON_ROTATE, LABEL_BACKGROUND},
+        {ICON_CNC, LABEL_BACKGROUND}, // was ICON_STATUS_SPEED ICON_MOVE
+        {ICON_MAINMENU, LABEL_BACKGROUND},
         {ICON_BACKGROUND, LABEL_BACKGROUND},
         {ICON_BACKGROUND, LABEL_BACKGROUND},
-        {ICON_PRINT, LABEL_PRINT},
+        {ICON_STOP, LABEL_BACKGROUND},
     }};
 
-const ITEM ToolItems[3] = {
-    // icon                       label
-    {ICON_STATUSNOZZLE, LABEL_BACKGROUND},
-    {ICON_STATUSJOBSETUP, LABEL_BACKGROUND},
-    {ICON_STATUSFAN, LABEL_BACKGROUND},
-};
-const ITEM SpeedItems[2] = {
-    // icon                       label
-    {ICON_STATUS_SPEED, LABEL_BACKGROUND},
-    {ICON_STATUS_FLOW, LABEL_BACKGROUND},
-};
+// const ITEM ToolItems[0] = {
+//     // icon                       label
+//     {ICON_STATUSNOZZLE, LABEL_BACKGROUND},
+//     {ICON_STATUSJOBSETUP, LABEL_BACKGROUND},
+//     {ICON_STATUSFAN, LABEL_BACKGROUND},
+// };
+// const ITEM SpeedItems[0] = {
+//     // icon                       label
+//     {ICON_MOVE, LABEL_BACKGROUND}, // ICON_STATUS_SPEED
+//     {ICON_STATUS_FLOW, LABEL_BACKGROUND},
+// };
 
 static u32 nextTime = 0;
 static u32 update_time = 2000; // 1 seconds is 1000
@@ -89,56 +89,69 @@ const GUI_RECT RecGantry = {START_X, 1 * ICON_HEIGHT + 0 * SPACE_Y + ICON_START_
 
 } */
 
-void drawTemperature(void)
+// void drawTemperature(void)
+// {
+//   //icons and their values are updated one by one to reduce flicker/clipping
+
+//   char tempstr[100];
+//   GUI_SetTextMode(GUI_TEXTMODE_TRANS);
+//   GUI_SetColor(HEADING_COLOR);
+//   menuDrawIconOnly(&ToolItems[0], 0);                                                //Ext icon
+//   GUI_DispStringRight(pointID[0].x, pointID[0].y, (u8 *)heatDisplayID[current_Ext]); //Ext label
+
+//   // GUI_SetColor(VAL_COLOR);
+//   // my_sprintf(tempstr, "%d/%d", heatGetCurrentTemp(current_Ext), heatGetTargetTemp(current_Ext));
+//   // GUI_DispStringInPrect(&rectB[0], (u8 *)tempstr); //Ext value
+
+//   GUI_SetColor(HEADING_COLOR);
+//   menuDrawIconOnly(&ToolItems[1], 1);                                        //Bed icon
+//   GUI_DispStringRight(pointID[1].x, pointID[1].y, (u8 *)heatDisplayID[POS]); //Bed label
+//   GUI_SetColor(VAL_COLOR);
+//   my_sprintf(tempstr, "%d/%d", xaxis, yaxis);
+//   GUI_DispStringInPrect(&rectB[1], (u8 *)tempstr); //Bed value
+
+//   GUI_SetColor(HEADING_COLOR);
+//   menuDrawIconOnly(&ToolItems[2], 2);                                        //Fan icon
+//   GUI_DispStringRight(pointID[2].x, pointID[2].y, (u8 *)fanID[current_fan]); //Fan label
+//   GUI_SetColor(VAL_COLOR);
+
+//   u8 fs;
+// #ifdef SHOW_FAN_PERCENTAGE
+//   fs = (fanGetSpeed(current_fan) * 100) / 255;
+//   my_sprintf(tempstr, "%d%%", fs);
+// #else
+//   fs = fanSpeed[current_fan];
+//   my_sprintf(tempstr, "%d", fs);
+// #endif
+//   GUI_DispStringInPrect(&rectB[2], (u8 *)tempstr); //Fan value
+
+//   /*
+// Text updates for ICON_STATUS_SPEED
+// */
+//   // GUI_SetColor(HEADING_COLOR);
+//   // menuDrawIconOnly(&SpeedItems[current_speedID], 3);                               //Speed / flow icon
+//   // GUI_DispStringRight(pointID[3].x, pointID[3].y, (u8 *)SpeedID[current_speedID]); //Speed / flow label
+//   // GUI_SetColor(VAL_COLOR);
+//   // my_sprintf(tempstr, "%d%s", speedGetPercent(current_speedID), "%");
+//   // GUI_DispStringInPrect(&rectB[3], (u8 *)tempstr); //Speed / Flow value
+
+//   GUI_SetTextMode(GUI_TEXTMODE_NORMAL);
+//   GUI_SetColor(GANTRYLBL_COLOR);
+//   GUI_SetBkColor(GANTRYLBL_BKCOLOR);
+//   my_sprintf(tempstr, "   X: %.2f   Y: %.2f   Z: %.2f   ", xaxis, yaxis, zaxis);
+//   GUI_DispStringInPrect(&RecGantry, (u8 *)tempstr);
+
+//   GUI_RestoreColorDefault();
+// }
+
+void updateGantry()
 {
-  //icons and their values are updated one by one to reduce flicker/clipping
-
   char tempstr[100];
-  GUI_SetTextMode(GUI_TEXTMODE_TRANS);
-  GUI_SetColor(HEADING_COLOR);
-  menuDrawIconOnly(&ToolItems[0], 0);                                                //Ext icon
-  GUI_DispStringRight(pointID[0].x, pointID[0].y, (u8 *)heatDisplayID[current_Ext]); //Ext label
-
-  GUI_SetColor(VAL_COLOR);
-  my_sprintf(tempstr, "%d/%d", heatGetCurrentTemp(current_Ext), heatGetTargetTemp(current_Ext));
-  GUI_DispStringInPrect(&rectB[0], (u8 *)tempstr); //Ext value
-
-  GUI_SetColor(HEADING_COLOR);
-  menuDrawIconOnly(&ToolItems[1], 1);                                        //Bed icon
-  GUI_DispStringRight(pointID[1].x, pointID[1].y, (u8 *)heatDisplayID[BED]); //Bed label
-  GUI_SetColor(VAL_COLOR);
-  my_sprintf(tempstr, "%d/%d", heatGetCurrentTemp(BED), heatGetTargetTemp(BED));
-  GUI_DispStringInPrect(&rectB[1], (u8 *)tempstr); //Bed value
-
-  GUI_SetColor(HEADING_COLOR);
-  menuDrawIconOnly(&ToolItems[2], 2);                                        //Fan icon
-  GUI_DispStringRight(pointID[2].x, pointID[2].y, (u8 *)fanID[current_fan]); //Fan label
-  GUI_SetColor(VAL_COLOR);
-
-  u8 fs;
-#ifdef SHOW_FAN_PERCENTAGE
-  fs = (fanGetSpeed(current_fan) * 100) / 255;
-  my_sprintf(tempstr, "%d%%", fs);
-#else
-  fs = fanSpeed[current_fan];
-  my_sprintf(tempstr, "%d", fs);
-#endif
-  GUI_DispStringInPrect(&rectB[2], (u8 *)tempstr); //Fan value
-
-  GUI_SetColor(HEADING_COLOR);
-  menuDrawIconOnly(&SpeedItems[current_speedID], 3);                               //Speed / flow icon
-  GUI_DispStringRight(pointID[3].x, pointID[3].y, (u8 *)SpeedID[current_speedID]); //Speed / flow label
-  GUI_SetColor(VAL_COLOR);
-  my_sprintf(tempstr, "%d%s", speedGetPercent(current_speedID), "%");
-  GUI_DispStringInPrect(&rectB[3], (u8 *)tempstr); //Speed / Flow value
-
   GUI_SetTextMode(GUI_TEXTMODE_NORMAL);
   GUI_SetColor(GANTRYLBL_COLOR);
   GUI_SetBkColor(GANTRYLBL_BKCOLOR);
   my_sprintf(tempstr, "   X: %.2f   Y: %.2f   Z: %.2f   ", xaxis, yaxis, zaxis);
   GUI_DispStringInPrect(&RecGantry, (u8 *)tempstr);
-
-  GUI_RestoreColorDefault();
 }
 
 void storegantry(int n, float val)
@@ -292,7 +305,7 @@ void toggleTool(void)
     }
     current_speedID = (current_speedID + 1) % 2;
     nextTime = OS_GetTimeMs() + update_time;
-    drawTemperature();
+    //drawTemperature();
 
     if (infoHost.connected == true)
     {
@@ -321,7 +334,8 @@ void menuStatus(void)
   GUI_SetColor(GANTRYLBL_BKCOLOR);
   //GUI_ClearPrect(&RecGantry);
   GUI_FillPrect(&RecGantry);
-  drawTemperature();
+  //drawTemperature();
+  updateGantry();
   drawStatusScreenMsg();
 
   while (infoMenu.menu[infoMenu.cur] == menuStatus)
@@ -343,22 +357,23 @@ void menuStatus(void)
     switch (key_num)
     {
     case KEY_ICON_0:
-      infoMenu.menu[++infoMenu.cur] = menuUnifiedHeat;
+      infoMenu.menu[++infoMenu.cur] = menuMove;
       break;
     case KEY_ICON_1:
       infoMenu.menu[++infoMenu.cur] = menuJobSetup;
       break;
     case KEY_ICON_2:
-      infoMenu.menu[++infoMenu.cur] = menuFan;
+      infoMenu.menu[++infoMenu.cur] = menuRotate;
       break;
     case KEY_ICON_3:
-      infoMenu.menu[++infoMenu.cur] = menuSpeed;
+      infoMenu.menu[++infoMenu.cur] = menuPrint; //was menuMove
       break;
     case KEY_ICON_4:
       infoMenu.menu[++infoMenu.cur] = menuMain;
       break;
     case KEY_ICON_7:
-      infoMenu.menu[++infoMenu.cur] = menuPrint;
+      storeCmd("M112 \n"); //Emergency stop
+      //infoMenu.menu[++infoMenu.cur] = menuPrint;
       break;
 
     default:
