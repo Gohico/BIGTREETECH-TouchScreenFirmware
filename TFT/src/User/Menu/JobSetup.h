@@ -6,5 +6,6 @@
 
 void menuJobSetup(void);
 void jobSetupCmd(AXIS xyz);
+void jobSetupApplyAluParamsToWorkitem(void);
 
 #endif

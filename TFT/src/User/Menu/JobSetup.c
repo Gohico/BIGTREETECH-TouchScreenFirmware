@@ -17,7 +17,7 @@ const MENUITEMS jobSetupItems = {
         {ICON_JOBSETUPX, LABEL_HOME_Y},
         {ICON_JOBSETUPZ, LABEL_HOME_Z},
         {ICON_JOBSETUPALL, LABEL_HOME_ALL},
-        {ICON_BACKGROUND, LABEL_BACKGROUND},
+        {ICON_ALUPLATE, LABEL_BACKGROUND},
         {ICON_BACKGROUND, LABEL_BACKGROUND},
         {ICON_BACK, LABEL_BACK},
     }};
@@ -46,8 +46,11 @@ void menuJobSetup(void)
         case KEY_ICON_3:
             jobSetupCmd(Z_AXIS);
             break;
-        case KEY_ICON_5:
+        case KEY_ICON_4:
             jobSetupCmd(TOTAL_AXIS);
+            break;
+        case KEY_ICON_5:
+            jobSetupApplyAluParamsToWorkitem();
             break;
         case KEY_ICON_7:
             infoMenu.cur--;
@@ -59,6 +62,13 @@ void menuJobSetup(void)
         loopProcess();
         update_gantry();
     }
+}
+
+void jobSetupApplyAluParamsToWorkitem(void)
+{
+    //Alu plate offset: X = 10mm; Y=10mm; Z=7.5mm
+    //storeCmd("M851 X-10 Y-10 Z-7.5\n");
+    storeCmd("M206 Z7.5\n");
 }
 
 void jobSetupCmd(AXIS xyz)

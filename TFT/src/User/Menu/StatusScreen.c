@@ -326,6 +326,8 @@ void toggleTool(void)
 
 void menuStatus(void)
 {
+  storeCmd("M106 S100\n"); //Turn fan on
+
   booted = true;
   KEY_VALUES key_num = KEY_IDLE;
   GUI_SetBkColor(BACKGROUND_COLOR);
