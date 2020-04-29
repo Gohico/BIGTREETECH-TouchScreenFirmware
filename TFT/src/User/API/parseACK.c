@@ -10,7 +10,6 @@ const char *const ignoreEcho[] = {
   "busy: processing",
   "Now fresh file:",
   "Probe Z Offset:",
-  "paused for user",
   "Flow:",
   "echo:;",
   "echo:  G",
@@ -286,6 +285,10 @@ void parseACK(void)
         dualstepper[E_STEPPER] = true;
       }
     // Parse M115 capability report
+      else if(ack_seen("Cap:EEPROM:"))
+      {
+        infoMachineSettings.EEPROM = ack_value();
+      }
       else if(ack_seen("Cap:AUTOREPORT_TEMP:"))
       {
         infoMachineSettings.autoReportTemp = ack_value();
@@ -351,6 +354,10 @@ void parseACK(void)
       else if(ack_seen("Flow: "))
       {
         speedSetPercent(1,ack_value());
+      }
+      else if(ack_seen("paused for user"))
+      {
+        popupPauseForUser();
       }
     //Parse error messages & Echo messages
       else if(ack_seen(errormagic))
