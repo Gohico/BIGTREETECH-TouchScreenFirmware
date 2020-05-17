@@ -185,7 +185,7 @@ void parseACK(void)
             }
           }
         }
-        avoid_terminal = infoSettings.terminalACK;
+        avoid_terminal = !infoSettings.terminalACK;
         updateNextHeatCheckTime();
       }
       else if(ack_seen("X:") && ack_index == 2)
@@ -205,13 +205,12 @@ void parseACK(void)
         coordinateSetAxisActualSteps(E_AXIS, ack_value());
       }
 
-  #ifdef ONBOARD_SD_SUPPORT
-      else if(ack_seen(bsdnoprintingmagic) && infoMenu.menu[infoMenu.cur] == menuPrinting)
+      else if(ack_seen(bsdnoprintingmagic) && infoMenu.menu[infoMenu.cur] == menuPrinting && infoMachineSettings.onboard_sd_support == 1)
       {
         infoHost.printing = false;
         completePrinting();
       }
-      else if(ack_seen(bsdprintingmagic))
+      else if(ack_seen(bsdprintingmagic) && infoMachineSettings.onboard_sd_support == 1)
       {
         if(infoMenu.menu[infoMenu.cur] != menuPrinting && !infoHost.printing) {
           infoMenu.menu[++infoMenu.cur] = menuPrinting;
@@ -224,7 +223,7 @@ void parseACK(void)
         setPrintCur(position);
   //      powerFailedCache(position);
       }
-  #endif
+
     //parse and store stepper steps/mm values
       else if(ack_seen("M92 X"))
       {
@@ -233,12 +232,26 @@ void parseACK(void)
         if(ack_seen("Z")) setParameter(P_STEPS_PER_MM, Z_STEPPER, ack_value());
         if(ack_seen("E")) setParameter(P_STEPS_PER_MM, E_STEPPER, ack_value());
       }
+      else if(ack_seen("M92 T0 E")){
+        setParameter(P_STEPS_PER_MM, E_STEPPER, ack_value());
+      }
+      else if(ack_seen("M92 T1 E")){
+        setParameter(P_STEPS_PER_MM, E2_STEPPER, ack_value());
+        dualstepper[E_STEPPER] = true;
+      }
     //parse and store Max Feed Rate values
      else if(ack_seen("M203 X")){
                           setParameter(P_MAX_FEED_RATE, X_STEPPER, ack_value());
         if(ack_seen("Y")) setParameter(P_MAX_FEED_RATE, Y_STEPPER, ack_value());
         if(ack_seen("Z")) setParameter(P_MAX_FEED_RATE, Z_STEPPER, ack_value());
         if(ack_seen("E")) setParameter(P_MAX_FEED_RATE, E_STEPPER, ack_value());
+      }
+      else if(ack_seen("M203 T0 E")){
+        setParameter(P_MAX_FEED_RATE, E_STEPPER, ack_value());
+      }
+      else if(ack_seen("M203 T1 E")){
+        setParameter(P_MAX_FEED_RATE, E2_STEPPER, ack_value());
+        dualstepper[E_STEPPER] = true;
       }
     //parse and store Max Acceleration values
       else if(ack_seen("M201 X")){
@@ -247,6 +260,13 @@ void parseACK(void)
         if(ack_seen("Z")) setParameter(P_MAX_ACCELERATION, Z_STEPPER, ack_value());
         if(ack_seen("E")) setParameter(P_MAX_ACCELERATION, E_STEPPER, ack_value());
 
+      }
+      else if(ack_seen("M201 T0 E")){
+        setParameter(P_MAX_ACCELERATION, E_STEPPER, ack_value());
+      }
+      else if(ack_seen("M201 T1 E")){
+        setParameter(P_MAX_ACCELERATION, E2_STEPPER, ack_value());
+        dualstepper[E_STEPPER] = true;
       }
     //parse and store Acceleration values
       else if(ack_seen("M204 P")){
@@ -321,6 +341,10 @@ void parseACK(void)
       {
         infoMachineSettings.emergencyParser = ack_value();
       }
+      else if(ack_seen("Cap:SDCARD:"))
+      {
+        infoMachineSettings.onboard_sd_support = ack_value();
+      }
       else if(ack_seen("Cap:AUTOREPORT_SD_STATUS:"))
       {
         infoMachineSettings.autoReportSDStatus = ack_value();
@@ -386,7 +410,7 @@ void parseACK(void)
     {
       Serial_Puts(ack_cur_src, dmaL2Cache);
     }
-    else if (!ack_seen("ok"))
+    else if (!ack_seen("ok") || ack_seen("T:") || ack_seen("T0:"))
     {
       // make sure we pass on spontaneous messages to all connected ports (since these can come unrequested)
       for (int port = 0; port < _UART_CNT; port++)

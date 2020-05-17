@@ -11,9 +11,9 @@ MENUITEMS babyStepItems = {
         {ICON_BACKGROUND, LABEL_BACKGROUND},
         {ICON_BACKGROUND, LABEL_BACKGROUND},
         {ICON_INC, LABEL_INC},
-        {ICON_EEPROM_SAVE, LABEL_EEPROM_SAVE},
+        {ICON_BACKGROUND, LABEL_BACKGROUND},
         {ICON_01_MM, LABEL_01_MM},
-        {ICON_NORMAL_SPEED, LABEL_VALUE_ZERO},
+        {ICON_RESET_VALUE, LABEL_RESET},
         {ICON_BACK, LABEL_BACK},
     }};
 
@@ -92,21 +92,15 @@ void menuBabyStep(void)
     case KEY_ICON_0:
       if (baby_step_value - elementsUnit.ele[elementsUnit.cur] > BABYSTEP_MIN_VALUE)
       {
-        if (storeCmd("M290 Z-%.2f\n", elementsUnit.ele[elementsUnit.cur]))
-          baby_step_value -= elementsUnit.ele[elementsUnit.cur];
+        mustStoreCmd("M290 Z-%.2f\n", elementsUnit.ele[elementsUnit.cur]);
+        baby_step_value -= elementsUnit.ele[elementsUnit.cur];
       }
       break;
     case KEY_ICON_3:
       if (baby_step_value + elementsUnit.ele[elementsUnit.cur] < BABYSTEP_MAX_VALUE)
       {
-        if (storeCmd("M290 Z%.2f\n", elementsUnit.ele[elementsUnit.cur]))
-          baby_step_value += elementsUnit.ele[elementsUnit.cur];
-      }
-      break;
-    case KEY_ICON_4:
-      if (infoMachineSettings.EEPROM == 1)
-      {
-        storeCmd("M500\n");
+        mustStoreCmd("M290 Z%.2f\n", elementsUnit.ele[elementsUnit.cur]);
+        baby_step_value += elementsUnit.ele[elementsUnit.cur];
       }
       break;
     case KEY_ICON_5:
@@ -115,8 +109,8 @@ void menuBabyStep(void)
       menuDrawItem(&babyStepItems.items[key_num], key_num);
       break;
     case KEY_ICON_6:
-      if (storeCmd("M290 Z%.2f\n", -baby_step_value))
-        baby_step_value = 0.0f;
+      mustStoreCmd("M290 Z%.2f\n", -baby_step_value);
+      baby_step_value = 0.0f;
       break;
     case KEY_ICON_7:
       infoMenu.cur--;
@@ -125,6 +119,7 @@ void menuBabyStep(void)
 #if LCD_ENCODER_SUPPORT
       if (encoderPosition)
       {
+        mustStoreCmd("M290 Z%.2f\n", elementsUnit.ele[elementsUnit.cur] * encoderPosition);
         baby_step_value += elementsUnit.ele[elementsUnit.cur] * encoderPosition;
         encoderPosition = 0;
       }

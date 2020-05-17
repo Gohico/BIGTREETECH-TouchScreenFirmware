@@ -15,6 +15,7 @@
 
 #include "boot.h"
 
+#include "Colors.h"
 #include "lcd.h"
 #include "LCD_Init.h"
 #include "lcd_dma.h"
@@ -55,6 +56,8 @@
 #include "Parametersetting.h"
 
 #include "extend.h"
+#include "list_item.h"
+#include "Numpad.h"
 #include "SanityCheck.h"
 
 //menu
@@ -72,6 +75,7 @@
 #include "Speed.h"
 #include "BabyStep.h"
 #include "ledcolor.h"
+#include "Parametersetting.h"
 
 #include "Extrude.h"
 #include "Fan.h"
@@ -90,7 +94,6 @@
 #include "UnifiedMove.h"
 #include "UnifiedHeat.h"
 #include "StatusScreen.h"
-#include "list_item.h"
 
 #define MAX_MENU_DEPTH 10 // max sub menu depth
 typedef void (*FP_MENU)(void);
@@ -112,5 +115,13 @@ typedef struct
 } HOST;
 
 extern HOST infoHost;
+
+typedef struct
+{
+  RCC_ClocksTypeDef rccClocks;
+  u32 PCLK1_Timer_Frequency;
+  u32 PCLK2_Timer_Frequency;
+} CLOCKS;
+extern CLOCKS mcuClocks;
 
 #endif

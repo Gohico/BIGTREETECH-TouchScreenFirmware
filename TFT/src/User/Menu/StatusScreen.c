@@ -31,7 +31,7 @@ const MENUITEMS StatusItems = {
 
 static u32 nextTime = 0;
 static u32 update_time = 2000; // 1 seconds is 1000
-SCROLL msgScroll;
+SCROLL     msgScroll;
 static int lastConnection_status = -1;
 static bool booted = false;
 
@@ -46,38 +46,39 @@ static bool gantryCmdWait = false;
 TOOL current_Ext = NOZZLE0;
 int current_fan = 0;
 int current_speedID = 0;
-const char *SpeedID[2] = SPEED_ID;
+const char* SpeedID[2] = SPEED_ID;
 // text position rectangles for Live icons
 //icon 0
 const GUI_POINT pointID[4] = {
-    {1 * ICON_WIDTH + 0 * SPACE_X + START_X - BYTE_WIDTH / 2, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
-    {2 * ICON_WIDTH + 1 * SPACE_X + START_X - BYTE_WIDTH / 2, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
-    {3 * ICON_WIDTH + 2 * SPACE_X + START_X - BYTE_WIDTH / 2, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
-    {4 * ICON_WIDTH + 3 * SPACE_X + START_X - BYTE_WIDTH / 2, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
+  {1*ICON_WIDTH+0*SPACE_X+START_X - BYTE_WIDTH/2,    ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
+  {2*ICON_WIDTH+1*SPACE_X+START_X - BYTE_WIDTH/2,    ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
+  {3*ICON_WIDTH+2*SPACE_X+START_X - BYTE_WIDTH/2,    ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
+  {4*ICON_WIDTH+3*SPACE_X+START_X - BYTE_WIDTH/2,    ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
 };
 const GUI_RECT rectB[4] = {
-    {START_X + 0 * ICON_WIDTH + 0 * SPACE_X, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
-     START_X + 1 * ICON_WIDTH + 0 * SPACE_X, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
+  {START_X + 0 * ICON_WIDTH + 0 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
+   START_X + 1 * ICON_WIDTH + 0 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
 
-    {START_X + 1 * ICON_WIDTH + 1 * SPACE_X, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
-     START_X + 2 * ICON_WIDTH + 1 * SPACE_X, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
+  {START_X + 1 * ICON_WIDTH + 1 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
+   START_X + 2 * ICON_WIDTH + 1 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
 
-    {START_X + 2 * ICON_WIDTH + 2 * SPACE_X, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
-     START_X + 3 * ICON_WIDTH + 2 * SPACE_X, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
+  {START_X + 2 * ICON_WIDTH + 2 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
+   START_X + 3 * ICON_WIDTH + 2 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
 
-    {START_X + 3 * ICON_WIDTH + 3 * SPACE_X, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
-     START_X + 4 * ICON_WIDTH + 3 * SPACE_X, ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
+  {START_X + 3 * ICON_WIDTH + 3 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
+   START_X + 4 * ICON_WIDTH + 3 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
 };
 
 //info rectangle
-const GUI_RECT RectInfo = {START_X + 1 * ICON_WIDTH + 1 * SPACE_X, ICON_START_Y + 1 * ICON_HEIGHT + 1 * SPACE_Y,
-                           START_X + 3 * ICON_WIDTH + 2 * SPACE_X, ICON_START_Y + 2 * ICON_HEIGHT + 1 * SPACE_Y};
+const GUI_RECT RectInfo = {START_X + 1 * ICON_WIDTH + 1 * SPACE_X,  ICON_START_Y +  1 * ICON_HEIGHT + 1 * SPACE_Y,
+                           START_X + 3 * ICON_WIDTH + 2 * SPACE_X,  ICON_START_Y +  2 * ICON_HEIGHT + 1 * SPACE_Y};
 
-const GUI_RECT msgRect = {START_X + 1 * ICON_WIDTH + 1 * SPACE_X + 2, ICON_START_Y + 1 * ICON_HEIGHT + 1 * SPACE_Y + STATUS_MSG_BODY_YOFFSET,
-                          START_X + 3 * ICON_WIDTH + 2 * SPACE_X - 2, ICON_START_Y + 2 * ICON_HEIGHT + 1 * SPACE_Y - STATUS_MSG_BODY_BOTTOM};
+const  GUI_RECT msgRect ={START_X + 1 * ICON_WIDTH + 1 * SPACE_X + 2,   ICON_START_Y +  1 * ICON_HEIGHT + 1 * SPACE_Y + STATUS_MSG_BODY_YOFFSET,
+                          START_X + 3 * ICON_WIDTH + 2 * SPACE_X - 2,   ICON_START_Y +  2 * ICON_HEIGHT + 1 * SPACE_Y - STATUS_MSG_BODY_BOTTOM};
 
-const GUI_RECT RecGantry = {START_X, 1 * ICON_HEIGHT + 0 * SPACE_Y + ICON_START_Y + STATUS_GANTRY_YOFFSET,
-                            4 * ICON_WIDTH + 3 * SPACE_X + START_X, 1 * ICON_HEIGHT + 1 * SPACE_Y + ICON_START_Y - STATUS_GANTRY_YOFFSET};
+const GUI_RECT RecGantry = {START_X,                        1*ICON_HEIGHT+0*SPACE_Y+ICON_START_Y + STATUS_GANTRY_YOFFSET,
+                            4*ICON_WIDTH+3*SPACE_X+START_X, 1*ICON_HEIGHT+1*SPACE_Y+ICON_START_Y - STATUS_GANTRY_YOFFSET};
+
 
 /*set status icons */
 /* void set_status_icon(void)
@@ -149,14 +150,15 @@ void updateGantry()
   char tempstr[100];
   GUI_SetTextMode(GUI_TEXTMODE_NORMAL);
   GUI_SetColor(GANTRYLBL_COLOR);
-  GUI_SetBkColor(GANTRYLBL_BKCOLOR);
+  GUI_SetBkColor(lcd_colors[infoSettings.status_xyz_bg_color]);
   my_sprintf(tempstr, "   X: %.2f   Y: %.2f   Z: %.2f   ", xaxis, yaxis, zaxis);
-  GUI_DispStringInPrect(&RecGantry, (u8 *)tempstr);
+  GUI_DispStringInPrect(&RecGantry,(u8 *)tempstr);
+
+  GUI_RestoreColorDefault();
 }
 
-void storegantry(int n, float val)
-{
-  //float* px = &val;
+void storegantry(int n, float val){
+    //float* px = &val;
   switch (n)
   {
   case 0:
@@ -174,60 +176,52 @@ void storegantry(int n, float val)
   gantryCmdWait = false;
 }
 
-void gantry_inc(int n, float val)
-{
-  //float* px = &val;
+void gantry_inc(int n, float val){
+    //float* px = &val;
   switch (n)
   {
   case 0:
     xaxis += val;
-    if (xaxis > X_MAX_POS)
-    {
-      xaxis = X_MAX_POS;
+    if ( xaxis > infoSettings.machine_size_max[X_AXIS]){
+      xaxis = infoSettings.machine_size_max[X_AXIS];
     }
     break;
   case 1:
     yaxis += val;
-    if (yaxis > Y_MAX_POS)
-    {
-      yaxis = Y_MAX_POS;
+    if ( yaxis > infoSettings.machine_size_max[Y_AXIS]){
+      yaxis = infoSettings.machine_size_max[Y_AXIS];
     }
     break;
   case 2:
     zaxis += val;
-    if (zaxis > Z_MAX_POS)
-    {
-      zaxis = Z_MAX_POS;
+    if ( zaxis > infoSettings.machine_size_max[Z_AXIS]){
+      zaxis = infoSettings.machine_size_max[Z_AXIS];
     }
     break;
   default:
     break;
   }
 }
-void gantry_dec(int n, float val)
-{
-  //float* px = &val;
+void gantry_dec(int n, float val){
+    //float* px = &val;
   switch (n)
   {
   case 0:
     xaxis -= val;
-    if (xaxis < X_MIN_POS)
-    {
-      xaxis = X_MIN_POS;
+    if ( xaxis < infoSettings.machine_size_min[X_AXIS]){
+      xaxis = infoSettings.machine_size_min[X_AXIS];
     }
     break;
   case 1:
     yaxis -= val;
-    if (yaxis < Y_MIN_POS)
-    {
-      yaxis = Y_MIN_POS;
+    if ( yaxis < infoSettings.machine_size_min[Y_AXIS]){
+      yaxis = infoSettings.machine_size_min[Y_AXIS];
     }
     break;
   case 2:
     zaxis -= val;
-    if (zaxis < Z_MIN_POS)
-    {
-      zaxis = Z_MIN_POS;
+    if ( zaxis < infoSettings.machine_size_min[Z_AXIS]){
+      zaxis = infoSettings.machine_size_min[Z_AXIS];
     }
     break;
   default:
@@ -235,8 +229,7 @@ void gantry_dec(int n, float val)
   }
 }
 
-float getAxisLocation(u8 n)
-{
+float getAxisLocation(u8 n){
   switch (n)
   {
   case 0:
@@ -249,6 +242,7 @@ float getAxisLocation(u8 n)
     return xaxis;
   }
 }
+
 
 void statusScreen_setMsg(const uint8_t *title, const uint8_t *msg)
 {
@@ -263,14 +257,14 @@ void statusScreen_setMsg(const uint8_t *title, const uint8_t *msg)
 
 void drawStatusScreenMsg(void)
 {
-  //GUI_ClearRect(RectInfo.x0,RectInfo.y0,RectInfo.x1,RectInfo.y1);
+//GUI_ClearRect(RectInfo.x0,RectInfo.y0,RectInfo.x1,RectInfo.y1);
   GUI_SetTextMode(GUI_TEXTMODE_TRANS);
 
-  ICON_CustomReadDisplay(RectInfo.x0, RectInfo.y0, INFOBOX_WIDTH, INFOBOX_HEIGHT, INFOBOX_ADDR);
+  ICON_CustomReadDisplay(RectInfo.x0,RectInfo.y0,INFOBOX_WIDTH,INFOBOX_HEIGHT,INFOBOX_ADDR);
   GUI_SetColor(INFOMSG_BKCOLOR);
-  GUI_DispString(RectInfo.x0 + STATUS_MSG_ICON_XOFFSET, RectInfo.y0 + STATUS_MSG_ICON_YOFFSET, IconCharSelect(ICONCHAR_INFO));
+  GUI_DispString(RectInfo.x0 + STATUS_MSG_ICON_XOFFSET, RectInfo.y0 + STATUS_MSG_ICON_YOFFSET,IconCharSelect(ICONCHAR_INFO));
 
-  GUI_DispString(RectInfo.x0 + BYTE_HEIGHT + STATUS_MSG_TITLE_XOFFSET, RectInfo.y0 + STATUS_MSG_ICON_YOFFSET, (u8 *)msgtitle);
+  GUI_DispString(RectInfo.x0 + BYTE_HEIGHT+ STATUS_MSG_TITLE_XOFFSET,RectInfo.y0 + STATUS_MSG_ICON_YOFFSET,(u8*)msgtitle);
   GUI_SetBkColor(INFOMSG_BKCOLOR);
   GUI_FillPrect(&msgRect);
 
@@ -279,11 +273,10 @@ void drawStatusScreenMsg(void)
   GUI_RestoreColorDefault();
 }
 
-void scrollMsg(void)
-{
+void scrollMsg(void){
   GUI_SetBkColor(INFOMSG_BKCOLOR);
   GUI_SetColor(INFOMSG_COLOR);
-  Scroll_DispString(&msgScroll, CENTER);
+  Scroll_DispString(&msgScroll,CENTER);
   GUI_RestoreColorDefault();
 }
 
@@ -330,11 +323,11 @@ void menuStatus(void)
 
   booted = true;
   KEY_VALUES key_num = KEY_IDLE;
-  GUI_SetBkColor(BACKGROUND_COLOR);
+  GUI_SetBkColor(lcd_colors[infoSettings.bg_color]);
   //set_status_icon();
   menuDrawPage(&StatusItems);
-  GUI_SetColor(GANTRYLBL_BKCOLOR);
-  //GUI_ClearPrect(&RecGantry);
+  GUI_SetColor(lcd_colors[infoSettings.status_xyz_bg_color]);
+      //GUI_ClearPrect(&RecGantry);
   GUI_FillPrect(&RecGantry);
   //drawTemperature();
   updateGantry();
@@ -342,14 +335,11 @@ void menuStatus(void)
 
   while (infoMenu.menu[infoMenu.cur] == menuStatus)
   {
-    if (infoHost.connected != lastConnection_status)
-    {
-      if (infoHost.connected == false)
-      {
+    if(infoHost.connected != lastConnection_status){
+      if(infoHost.connected == false){
         statusScreen_setMsg(textSelect(LABEL_SCREEN_INFO), textSelect(LABEL_UNCONNECTED));
       }
-      else
-      {
+      else{
         statusScreen_setMsg(textSelect(LABEL_SCREEN_INFO), textSelect(LABEL_READY));
       }
       lastConnection_status = infoHost.connected;
@@ -371,7 +361,7 @@ void menuStatus(void)
       infoMenu.menu[++infoMenu.cur] = menuPrint; //was menuMove
       break;
     case KEY_ICON_4:
-      infoMenu.menu[++infoMenu.cur] = menuMain;
+      infoMenu.menu[++infoMenu.cur] = unifiedMenu;
       break;
     case KEY_ICON_7:
       storeCmd("M112 \n"); //Emergency stop
