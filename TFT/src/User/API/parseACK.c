@@ -4,16 +4,19 @@
 char dmaL2Cache[ACK_MAX_SIZE];
 static u16 ack_index=0;
 static u8 ack_cur_src = SERIAL_PORT;
-int MODEselect;
-// Ignore reply "echo:" message (don't display in popup menu)
+
+// Ignore reply messages which starts with following text (don't display in popup menu)
 const char *const ignoreEcho[] = {
   "busy: processing",
   "Now fresh file:",
-  "Probe Z Offset:",
+  "Now doing file:,"
+  "Probe Offset",
   "Flow:",
-  "echo:;",
-  "echo:  G",
-  "echo:  M",
+  "echo:;",     //M503
+  "echo:  G",   //M503
+  "echo:  M",   //M503
+  "Cap:",       //M115
+  "Config:",    //M360
 };
 
 bool portSeen[_UART_CNT] = {false, false, false, false, false, false};
@@ -113,13 +116,18 @@ void parseACK(void)
 
     if(infoHost.connected == false) //not connected to Marlin
     {
+      // Parse error information even though not connected to printer
+      if(ack_seen(errormagic)) {
+        BUZZER_PLAY(sound_error);
+        ackPopupInfo(errormagic);
+      }
       if(!ack_seen("T:") && !ack_seen("T0:"))  goto parse_end;  //the first response should be such as "T:25/50\n"
-        updateNextHeatCheckTime();
-        infoHost.connected = true;
-        storeCmd("M115\n");
-        storeCmd("M503 S0\n");
-        storeCmd("M92\n"); // Steps/mm of extruder is an important parameter for Smart filament runout
-                           // Avoid can't getting this parameter due to disabled M503 in Marlin
+      updateNextHeatCheckTime();
+      infoHost.connected = true;
+      storeCmd("M115\n");
+      storeCmd("M503 S0\n");
+      storeCmd("M92\n"); // Steps/mm of extruder is an important parameter for Smart filament runout
+                         // Avoid can't getting this parameter due to disabled M503 in Marlin
     }
 
     // Gcode command response
@@ -175,7 +183,7 @@ void parseACK(void)
         if(!heatGetSendWaiting(i)){
           heatSyncTargetTemp(i, ack_second_value()+0.5);
         }
-        for(TOOL i = BED; i < HEATER_NUM; i++)
+        for(TOOL i = BED; i < HEATER_COUNT; i++)
         {
           if(ack_seen(toolID[i]))
           {
@@ -205,12 +213,12 @@ void parseACK(void)
         coordinateSetAxisActualSteps(E_AXIS, ack_value());
       }
 
-      else if(ack_seen(bsdnoprintingmagic) && infoMenu.menu[infoMenu.cur] == menuPrinting && infoMachineSettings.onboard_sd_support == 1)
+      else if(ack_seen(bsdnoprintingmagic) && infoMenu.menu[infoMenu.cur] == menuPrinting && infoMachineSettings.onboard_sd_support == ENABLED)
       {
         infoHost.printing = false;
         completePrinting();
       }
-      else if(ack_seen(bsdprintingmagic) && infoMachineSettings.onboard_sd_support == 1)
+      else if(ack_seen(bsdprintingmagic) && infoMachineSettings.onboard_sd_support == ENABLED)
       {
         if(infoMenu.menu[infoMenu.cur] != menuPrinting && !infoHost.printing) {
           infoMenu.menu[++infoMenu.cur] = menuPrinting;
@@ -219,7 +227,7 @@ void parseACK(void)
         // Parsing printing data
         // Example: SD printing byte 123/12345
         char *ptr;
-        u32 position = strtol(strstr(dmaL2Cache, "byte ")+5, &ptr, 10);
+        u32 position = strtol(strstr(dmaL2Cache, "byte ") + 5, &ptr, 10);
         setPrintCur(position);
   //      powerFailedCache(position);
       }
@@ -305,6 +313,16 @@ void parseACK(void)
         dualstepper[E_STEPPER] = true;
       }
     // Parse M115 capability report
+
+      else if(ack_seen("FIRMWARE_NAME:Marlin"))
+      {
+        infoMachineSettings.isMarlinFirmware = 1;
+      }
+      else if(ack_seen("FIRMWARE_NAME:Smoothieware"))
+      {
+        infoMachineSettings.isMarlinFirmware = 0;
+        setupMachine();
+      }
       else if(ack_seen("Cap:EEPROM:"))
       {
         infoMachineSettings.EEPROM = ack_value();
@@ -337,17 +355,17 @@ void parseACK(void)
       {
         infoMachineSettings.caseLightsBrightness = ack_value();
       }
-      else if(ack_seen("Cap:EMERGENCY_PARSER:"))
-      {
-        infoMachineSettings.emergencyParser = ack_value();
-      }
-      else if(ack_seen("Cap:SDCARD:"))
+      else if(ack_seen("Cap:SDCARD:") && infoSettings.onboardSD == AUTO)
       {
         infoMachineSettings.onboard_sd_support = ack_value();
       }
       else if(ack_seen("Cap:AUTOREPORT_SD_STATUS:"))
       {
         infoMachineSettings.autoReportSDStatus = ack_value();
+      }
+      else if(ack_seen("Cap:LONG_FILENAME:") && infoSettings.longFileName == AUTO)
+      {
+        infoMachineSettings.long_filename_support = ack_value();
       }
       else if(ack_seen("Cap:CHAMBER_TEMPERATURE:"))
       {
@@ -360,7 +378,7 @@ void parseACK(void)
       }
       else if(ack_seen("Probe Offset"))
       {
-        if(ack_seen("Z"))
+        if(ack_seen("Z:"))
         {
           setParameter(P_PROBE_OFFSET,Z_STEPPER, ack_value());
         }

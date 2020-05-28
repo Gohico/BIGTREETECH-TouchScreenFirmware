@@ -176,7 +176,7 @@ u32 numPadInt(u32 old_val)
     Draw_keyboard();
     GUI_DispStringInPrect(&arrowRect,(u8 *)">");
     char tempstr[BUFLONG];
-    my_sprintf(tempstr, "%.2f", old_val);
+    my_sprintf(tempstr, "%d", old_val);
     GUI_DispStringInPrect(&oldParameterRect,(u8*)tempstr);
     touchSound = false;
     while (1)
@@ -215,7 +215,7 @@ u32 numPadInt(u32 old_val)
       case NUM_KEY_OK:
         if (nowIndex > 0)
         {
-          if (nowIndex == 1 &&(ParameterBuf[0] = '.' || ParameterBuf[0] == '-'))
+          if (nowIndex == 1 &&(ParameterBuf[0] == '.' || ParameterBuf[0] == '-'))
             break;
 
         BUZZER_PLAY(sound_ok);

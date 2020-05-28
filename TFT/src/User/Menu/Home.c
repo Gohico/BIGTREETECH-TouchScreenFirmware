@@ -1,6 +1,7 @@
 #include "Home.h"
 #include "includes.h"
 
+//1��title(����), ITEM_PER_PAGE��item(ͼ��+��ǩ)
 const MENUITEMS homeItems = {
 //   title
 LABEL_HOME,
