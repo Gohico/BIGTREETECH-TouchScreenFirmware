@@ -24,7 +24,7 @@ bool powerFailedCreate(char *path)
 
   create_ok = false;
 
-  if(infoFile.source != TFT_SD)  return false;//support SD Card only now
+  if(infoFile.source == BOARD_SD)  return false; // on board SD not support now
 
   if(f_open(&fpPowerFailed, powerFailedFileName, FA_OPEN_ALWAYS | FA_WRITE) != FR_OK)  return false;
 
@@ -176,12 +176,13 @@ void menuPowerOff(void)
 {
   u16 key_num = IDLE_TOUCH;
   clearPowerFailed();
-  GUI_Clear(lcd_colors[infoSettings.bg_color]);
+  GUI_Clear(infoSettings.bg_color);
   GUI_DispString((LCD_WIDTH - GUI_StrPixelWidth(textSelect(LABEL_LOADING)))/2, LCD_HEIGHT/2 - BYTE_HEIGHT, textSelect(LABEL_LOADING));
 
   if(mountFS()==true && powerFailedExist())
   {
-    popupDrawPage(bottomDoubleBtn, textSelect(LABEL_POWER_FAILED), (u8* )infoFile.title, textSelect(LABEL_CONFIRM), textSelect(LABEL_CANCEL));
+    popupDrawPage(DIALOG_TYPE_ERROR, bottomDoubleBtn, textSelect(LABEL_POWER_FAILED), (u8* )infoFile.title,
+                    textSelect(LABEL_CONFIRM), textSelect(LABEL_CANCEL));
 
     while(infoMenu.menu[infoMenu.cur]==menuPowerOff)
     {

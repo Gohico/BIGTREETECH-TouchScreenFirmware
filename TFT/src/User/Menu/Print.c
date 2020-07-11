@@ -111,9 +111,9 @@ void gocdeIconDraw(void)
   scrollFileNameCreate(0);
   Scroll_CreatePara(&titleScroll, (uint8_t* )infoFile.title, &titleRect);
   printIconItems.title.address = (uint8_t* )infoFile.title;
-  GUI_SetBkColor(lcd_colors[infoSettings.title_bg_color]);
+  GUI_SetBkColor(infoSettings.title_bg_color);
   GUI_ClearPrect(&titleRect);
-  GUI_SetBkColor(lcd_colors[infoSettings.bg_color]);
+  GUI_SetBkColor(infoSettings.bg_color);
 
   //draw folders
   for(i=0;(i + infoFile.cur_page * NUM_PER_PAGE < infoFile.F_num) && (i < NUM_PER_PAGE) ; i++)                  // folder
@@ -127,17 +127,6 @@ void gocdeIconDraw(void)
   for( ;(i + infoFile.cur_page * NUM_PER_PAGE < infoFile.f_num + infoFile.F_num) && (i < NUM_PER_PAGE) ;i++)  // gcode file
   {
     curItem.icon = ICON_FILE;
-    if (infoFile.source == BOARD_SD) { // on board long file name, M33 is required.
-      menuDrawItem(&curItem, i);
-      if (infoMachineSettings.long_filename_support == ENABLED)
-      {
-        normalNameDisp(&gcodeRect[i], (u8* )infoFile.Longfile[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num]);
-      }
-      else
-      {
-        normalNameDisp(&gcodeRect[i], (u8* )infoFile.file[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num]);
-      }
-    } else {
       // if model preview bmp exists, display bmp directly without writing to flash
       gn = strlen(infoFile.file[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num]) - 6; // -6 means ".gcode"
       gnew = malloc(gn + 10);
@@ -150,7 +139,6 @@ void gocdeIconDraw(void)
       free(gnew);
       // model preview -- end
       normalNameDisp(&gcodeRect[i], (u8* )infoFile.file[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num]);
-    }
   }
 
   //clear blank icons
@@ -167,9 +155,9 @@ void gocdeListDraw(void)
 
   Scroll_CreatePara(&titleScroll, (u8 *)infoFile.title, &titleRect);
   printListItems.title.address = (u8 *)infoFile.title;
-  GUI_SetBkColor(lcd_colors[infoSettings.title_bg_color]);
+  GUI_SetBkColor(infoSettings.title_bg_color);
   GUI_ClearRect(0, 0, LCD_WIDTH, TITLE_END_Y);
-  GUI_SetBkColor(lcd_colors[infoSettings.bg_color]);
+  GUI_SetBkColor(infoSettings.bg_color);
 
   for (i = 0; (i + infoFile.cur_page * NUM_PER_PAGE < infoFile.F_num) && (i < NUM_PER_PAGE); i++) // folder
   {
@@ -181,13 +169,13 @@ void gocdeListDraw(void)
   for (; (i + infoFile.cur_page * NUM_PER_PAGE < infoFile.f_num + infoFile.F_num) && (i < NUM_PER_PAGE); i++) // gcode file
   {
     printListItems.items[i].icon = ICONCHAR_FILE;
-    if (infoMachineSettings.long_filename_support == ENABLED)
+    if (infoMachineSettings.long_filename_support == ENABLED && infoFile.source == BOARD_SD)
     {
-      setDynamicLabel(i, (infoFile.source == BOARD_SD) ? infoFile.Longfile[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num] : infoFile.file[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num]);
+      setDynamicLabel(i, infoFile.Longfile[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num]);
     }
     else
     {
-      setDynamicLabel(i, (infoFile.source == BOARD_SD) ? infoFile.file[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num] : infoFile.file[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num]);
+      setDynamicLabel(i, infoFile.file[i + infoFile.cur_page * NUM_PER_PAGE - infoFile.F_num]);
     }
 
     printListItems.items[i].titlelabel.index = LABEL_DYNAMIC;
@@ -229,6 +217,11 @@ void gocdeListDraw(void)
 }
 
 
+void startPrint(void)
+{
+  infoMenu.menu[++infoMenu.cur] = menuBeforePrinting;
+}
+
 const int16_t labelVolumeError[] = {LABEL_READ_TFTSD_ERROR, LABEL_READ_U_DISK_ERROR, LABEL_READ_ONBOARDSD_ERROR};
 
 void menuPrintFromSource(void)
@@ -237,7 +230,7 @@ void menuPrintFromSource(void)
 
   u8 update=0;
 
-  GUI_Clear(lcd_colors[infoSettings.bg_color]);
+  GUI_Clear(infoSettings.bg_color);
   GUI_DispStringInRect(0, 0, LCD_WIDTH, LCD_HEIGHT, textSelect(LABEL_LOADING));
 
   if (mountFS() == true && scanPrintFiles() == true)
@@ -260,9 +253,9 @@ void menuPrintFromSource(void)
 
   while(infoMenu.menu[infoMenu.cur] == menuPrintFromSource)
   {
-    GUI_SetBkColor(lcd_colors[infoSettings.title_bg_color]);
+    GUI_SetBkColor(infoSettings.title_bg_color);
     Scroll_DispString(&titleScroll, LEFT);    //
-    GUI_SetBkColor(lcd_colors[infoSettings.bg_color]);
+    GUI_SetBkColor(infoSettings.bg_color);
 
     if(list_mode != true){
       Scroll_DispString(&gcodeScroll, CENTER); //
@@ -308,7 +301,7 @@ void menuPrintFromSource(void)
         break;
 
       default:
-        if(key_num <= KEY_ICON_4)
+        if(key_num < ITEM_PER_PAGE)
         {
           u16 start = infoFile.cur_page * NUM_PER_PAGE;
           if(key_num + start < infoFile.F_num)						//folder
@@ -322,9 +315,8 @@ void menuPrintFromSource(void)
           {
             if(infoHost.connected !=true) break;
             if(EnterDir(infoFile.file[key_num + start - infoFile.F_num]) == false) break;
-
-            if (infoFile.source == TFT_SD) {
-              //load bmp preview in flash if file exists
+            //load bmp preview in flash if file exists
+            if (infoFile.source != BOARD_SD) {
               int16_t gn;
               char *gnew;
               gn = strlen(infoFile.file[key_num + start - infoFile.F_num]) - 6; // -6 means ".gcode"
@@ -342,9 +334,13 @@ void menuPrintFromSource(void)
                 }
                 free(gnew);
               }
-              //-load bmp preview in flash if file exists - end
             }
-            infoMenu.menu[++infoMenu.cur] = menuBeforePrinting;
+            //-load bmp preview in flash if file exists - end
+            char temp_info[75];
+            sprintf(temp_info, (char *)textSelect(LABEL_START_PRINT), infoFile.file[key_num + start - infoFile.F_num]);
+            //confirm file selction
+            showDialog(DIALOG_TYPE_QUESTION, textSelect(LABEL_PRINT), (u8*)temp_info,
+                        textSelect(LABEL_CONFIRM), textSelect(LABEL_CANCEL), startPrint, resetInfoFile, NULL);
           }
         }
 

@@ -36,7 +36,7 @@ static int lastConnection_status = -1;
 static bool booted = false;
 
 static char msgtitle[20];
-static char msgbody[512];
+static char msgbody[128];
 
 static float xaxis;
 static float yaxis;
@@ -49,25 +49,8 @@ int current_speedID = 0;
 const char* SpeedID[2] = SPEED_ID;
 // text position rectangles for Live icons
 //icon 0
-const GUI_POINT pointID[4] = {
-  {1*ICON_WIDTH+0*SPACE_X+START_X - BYTE_WIDTH/2,    ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
-  {2*ICON_WIDTH+1*SPACE_X+START_X - BYTE_WIDTH/2,    ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
-  {3*ICON_WIDTH+2*SPACE_X+START_X - BYTE_WIDTH/2,    ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
-  {4*ICON_WIDTH+3*SPACE_X+START_X - BYTE_WIDTH/2,    ICON_START_Y + 0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_NAME_Y0},
-};
-const GUI_RECT rectB[4] = {
-  {START_X + 0 * ICON_WIDTH + 0 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
-   START_X + 1 * ICON_WIDTH + 0 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
-
-  {START_X + 1 * ICON_WIDTH + 1 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
-   START_X + 2 * ICON_WIDTH + 1 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
-
-  {START_X + 2 * ICON_WIDTH + 2 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
-   START_X + 3 * ICON_WIDTH + 2 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
-
-  {START_X + 3 * ICON_WIDTH + 3 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0,
-   START_X + 4 * ICON_WIDTH + 3 * SPACE_X,  ICON_START_Y +  0 * ICON_HEIGHT + 0 * SPACE_Y + SSICON_VAL_Y0 + BYTE_HEIGHT},
-};
+const GUI_POINT ss_title_point = {ICON_WIDTH - BYTE_WIDTH/2, SSICON_NAME_Y0};
+const GUI_POINT ss_val_point   = {ICON_WIDTH/2, SSICON_VAL_Y0};
 
 //info rectangle
 const GUI_RECT RectInfo = {START_X + 1 * ICON_WIDTH + 1 * SPACE_X,  ICON_START_Y +  1 * ICON_HEIGHT + 1 * SPACE_Y,
@@ -150,8 +133,8 @@ void updateGantry()
   char tempstr[100];
   GUI_SetTextMode(GUI_TEXTMODE_NORMAL);
   GUI_SetColor(GANTRYLBL_COLOR);
-  GUI_SetBkColor(lcd_colors[infoSettings.status_xyz_bg_color]);
-  my_sprintf(tempstr, "   X: %.2f   Y: %.2f   Z: %.2f   ", xaxis, yaxis, zaxis);
+  GUI_SetBkColor(infoSettings.status_xyz_bg_color);
+  sprintf(tempstr, "   X: %.2f   Y: %.2f   Z: %.2f   ", xaxis, yaxis, zaxis);
   GUI_DispStringInPrect(&RecGantry,(u8 *)tempstr);
 
   GUI_RestoreColorDefault();
@@ -320,10 +303,10 @@ void menuStatus(void)
 
   booted = true;
   KEY_VALUES key_num = KEY_IDLE;
-  GUI_SetBkColor(lcd_colors[infoSettings.bg_color]);
+  GUI_SetBkColor(infoSettings.bg_color);
   //set_status_icon();
   menuDrawPage(&StatusItems);
-  GUI_SetColor(lcd_colors[infoSettings.status_xyz_bg_color]);
+  GUI_SetColor(infoSettings.status_xyz_bg_color);
       //GUI_ClearPrect(&RecGantry);
   GUI_FillPrect(&RecGantry);
   //drawTemperature();
