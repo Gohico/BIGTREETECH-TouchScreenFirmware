@@ -28,6 +28,7 @@
 #include "Serial.h"
 #include "spi.h"
 #include "sw_spi.h"
+#include "CircularQueue.h"
 #include "spi_slave.h"
 #include "timer_pwm.h"
 
@@ -42,6 +43,7 @@
 
 #include "LCD_Encoder.h"
 #include "ST7920_Simulator.h"
+#include "HD44780_Simulator.h"
 #include "ui_draw.h"
 #include "touch_process.h"
 #include "interfaceCmd.h"
@@ -54,7 +56,7 @@
 #include "flashStore.h"
 #include "parseACK.h"
 #include "Selectmode.h"
-#include "Parametersetting.h"
+#include "MarlinMode.h"
 #include "Temperature.h"
 #include "Settings.h"
 #include "Printing.h"
@@ -63,9 +65,12 @@
 #include "SpeedControl.h"
 
 #include "extend.h"
+#include "menu.h"
 #include "list_item.h"
 #include "list_widget.h"
+#include "Popup.h"
 #include "Numpad.h"
+#include "Notification.h"
 #include "SanityCheck.h"
 
 //menu
@@ -78,6 +83,7 @@
 #include "Home.h"
 #include "Rotate.h"
 #include "Print.h"
+#include "Printing.h"
 #include "More.h"
 #include "Speed.h"
 #include "BabyStep.h"
@@ -93,34 +99,40 @@
 #include "FeatureSettings.h"
 #include "SendGcode.h"
 #include "leveling.h"
+#include "UBLSaveLoad.h"
+#include "BLTouch.h"
 #include "ProbeOffset.h"
 #include "PowerFailed.h"
 
-#include "Popup.h"
 #include "Mode.h"
 
 #include "UnifiedMove.h"
 #include "UnifiedHeat.h"
 #include "StatusScreen.h"
 
-#define MAX_MENU_DEPTH 10 // max sub menu depth
+#include "Tuning.h"
+#include "Pid.h"
+#include "TuneExtruder.h"
+#include "ConnectionSettings.h"
+
+#define MAX_MENU_DEPTH 10       // max sub menu depth
 typedef void (*FP_MENU)(void);
 
 typedef struct
 {
-  FP_MENU menu[MAX_MENU_DEPTH]; // Menu function buffer
-  u8 cur;                       // Current menu index in buffer
-} MENU;
+  FP_MENU menu[MAX_MENU_DEPTH];  // Menu function buffer
+  u8      cur;                   // Current menu index in buffer
+}MENU;
 
 extern MENU infoMenu;
 
 typedef struct
 {
-  bool wait;             //Whether wait for Marlin's response
+  bool wait;       //Whether wait for Marlin's response
   bool rx_ok[_UART_CNT]; //Whether receive Marlin's response or get Gcode by other UART(ESP3D/OctoPrint)
-  bool connected;        //Whether have connected to Marlin
-  bool printing;         //Whether the host is busy in printing execution. ( USB serial printing and GCODE print from onboard)
-} HOST;
+  bool connected;  //Whether have connected to Marlin
+  bool printing;   //Whether the host is busy in printing execution. ( USB serial printing and GCODE print from onboard)
+}HOST;
 
 extern HOST infoHost;
 
@@ -129,7 +141,7 @@ typedef struct
   RCC_ClocksTypeDef rccClocks;
   u32 PCLK1_Timer_Frequency;
   u32 PCLK2_Timer_Frequency;
-} CLOCKS;
+}CLOCKS;
 extern CLOCKS mcuClocks;
 
 #endif
