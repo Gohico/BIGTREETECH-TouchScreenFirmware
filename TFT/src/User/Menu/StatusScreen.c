@@ -44,18 +44,18 @@ int current_speedID = 0;
 const char* SpeedID[2] = SPEED_ID;
 // text position rectangles for Live icons
 //icon 0
-const GUI_POINT ss_title_point = {ICON_WIDTH - BYTE_WIDTH/2, SSICON_NAME_Y0};
-const GUI_POINT ss_val_point   = {ICON_WIDTH/2, SSICON_VAL_Y0};
+const GUI_POINT ss_title_point = {SSICON_WIDTH - BYTE_WIDTH / 2, SSICON_NAME_Y0};
+const GUI_POINT ss_val_point   = {SSICON_WIDTH / 2, SSICON_VAL_Y0};
+#ifdef TFT70_V3_0
+  const GUI_POINT ss_val2_point = {SSICON_WIDTH/2, SSICON_VAL2_Y0};
+#endif
 
-//info rectangle
-const GUI_RECT RectInfo = {START_X + 1 * ICON_WIDTH + 1 * SPACE_X,  ICON_START_Y +  1 * ICON_HEIGHT + 1 * SPACE_Y,
-                           START_X + 3 * ICON_WIDTH + 2 * SPACE_X,  ICON_START_Y +  2 * ICON_HEIGHT + 1 * SPACE_Y};
+//info box msg area
+const  GUI_RECT msgRect = {START_X + 1 * ICON_WIDTH + 1 * SPACE_X + 2,   ICON_START_Y +  1 * ICON_HEIGHT + 1 * SPACE_Y + STATUS_MSG_BODY_YOFFSET,
+                           START_X + 3 * ICON_WIDTH + 2 * SPACE_X - 2,   ICON_START_Y +  2 * ICON_HEIGHT + 1 * SPACE_Y - STATUS_MSG_BODY_BOTTOM};
 
-const  GUI_RECT msgRect ={START_X + 1 * ICON_WIDTH + 1 * SPACE_X + 2,   ICON_START_Y +  1 * ICON_HEIGHT + 1 * SPACE_Y + STATUS_MSG_BODY_YOFFSET,
-                          START_X + 3 * ICON_WIDTH + 2 * SPACE_X - 2,   ICON_START_Y +  2 * ICON_HEIGHT + 1 * SPACE_Y - STATUS_MSG_BODY_BOTTOM};
-
-const GUI_RECT RecGantry = {START_X,                        1*ICON_HEIGHT+0*SPACE_Y+ICON_START_Y + STATUS_GANTRY_YOFFSET,
-                            4*ICON_WIDTH+3*SPACE_X+START_X, 1*ICON_HEIGHT+1*SPACE_Y+ICON_START_Y - STATUS_GANTRY_YOFFSET};
+const GUI_RECT RecGantry = {START_X,                                SSICON_HEIGHT + ICON_START_Y + STATUS_GANTRY_YOFFSET,
+                            START_X + 4 * ICON_WIDTH + 3 * SPACE_X, ICON_HEIGHT + SPACE_Y + ICON_START_Y - STATUS_GANTRY_YOFFSET};
 
 
 /*set status icons */
@@ -145,15 +145,16 @@ void statusScreen_setMsg(const uint8_t *title, const uint8_t *msg)
 void statusScreen_setReady(void)
 {
   strncpy(msgtitle, (char *)textSelect(LABEL_STATUS), sizeof(msgtitle));
-  if(infoHost.connected == false){
+  if (infoHost.connected == false)
+  {
     strncpy(msgbody, (char *)textSelect(LABEL_UNCONNECTED), sizeof(msgbody));
   }
-  else{
+  else
+  {
     strncpy(msgbody, (char *)machine_type, sizeof(msgbody));
     strcat(msgbody, " ");
     strcat(msgbody, (char *)textSelect(LABEL_READY));
   }
-
   msgNeedRefresh = true;
 }
 
@@ -162,44 +163,49 @@ void drawStatusScreenMsg(void)
 //GUI_ClearRect(RectInfo.x0,RectInfo.y0,RectInfo.x1,RectInfo.y1);
   GUI_SetTextMode(GUI_TEXTMODE_TRANS);
 
-  ICON_CustomReadDisplay(RectInfo.x0,RectInfo.y0,INFOBOX_WIDTH,INFOBOX_HEIGHT,INFOBOX_ADDR);
+  ICON_CustomReadDisplay(rect_of_keySS[17].x0, rect_of_keySS[17].y0, INFOBOX_ADDR);
   GUI_SetColor(INFOMSG_BKCOLOR);
-  GUI_DispString(RectInfo.x0 + STATUS_MSG_ICON_XOFFSET, RectInfo.y0 + STATUS_MSG_ICON_YOFFSET,IconCharSelect(ICONCHAR_INFO));
+  GUI_DispString(rect_of_keySS[17].x0 + STATUS_MSG_ICON_XOFFSET,
+                 rect_of_keySS[17].y0 + STATUS_MSG_ICON_YOFFSET,
+                 IconCharSelect(ICONCHAR_INFO));
 
-  GUI_DispString(RectInfo.x0 + BYTE_HEIGHT+ STATUS_MSG_TITLE_XOFFSET,RectInfo.y0 + STATUS_MSG_ICON_YOFFSET,(u8*)msgtitle);
+  GUI_DispString(rect_of_keySS[17].x0 + BYTE_HEIGHT + STATUS_MSG_TITLE_XOFFSET,
+                 rect_of_keySS[17].y0 + STATUS_MSG_ICON_YOFFSET,
+                 (uint8_t *)msgtitle);
   GUI_SetBkColor(INFOMSG_BKCOLOR);
   GUI_FillPrect(&msgRect);
 
-  Scroll_CreatePara(&msgScroll, (u8 *)msgbody, &msgRect);
+  Scroll_CreatePara(&msgScroll, (uint8_t *)msgbody, &msgRect);
 
   GUI_RestoreColorDefault();
 
   msgNeedRefresh = false;
 }
 
-void scrollMsg(void){
+static inline void scrollMsg(void)
+{
   GUI_SetBkColor(INFOMSG_BKCOLOR);
   GUI_SetColor(INFOMSG_COLOR);
   Scroll_DispString(&msgScroll,CENTER);
   GUI_RestoreColorDefault();
 }
 
-void toggleTool(void)
+static inline void toggleTool(void)
 {
-  if (OS_GetTimeMs() > nextTime)
+  if (nextScreenUpdate(UPDATE_TOOL_TIME))
   {
     if (infoSettings.hotend_count > 1)
     {
-      current_tool = (current_tool+1) % infoSettings.hotend_count;
+      currentTool = (currentTool + 1) % infoSettings.hotend_count;
     }
-    if (infoSettings.fan_count > 1)
+    if ((infoSettings.fan_count + infoSettings.fan_ctrl_count) > 1)
     {
-      current_fan = (current_fan + 1) % infoSettings.fan_count;
+      currentFan = (currentFan + 1) % (infoSettings.fan_count + infoSettings.fan_ctrl_count);
     }
-    current_speedID = (current_speedID + 1) % 2;
-    nextTime = OS_GetTimeMs() + update_time;
+    currentSpeedID = (currentSpeedID + 1) % 2;
     //drawTemperature();
 
+    // gcode queries must be call after drawTemperature
     coordinateQuery();
     speedQuery();
   }
@@ -222,11 +228,13 @@ void menuStatus(void)
 
   while (infoMenu.menu[infoMenu.cur] == menuStatus)
   {
-    if(infoHost.connected != lastConnection_status){
+    if (infoHost.connected != lastConnection_status)
+    {
       statusScreen_setReady();
       lastConnection_status = infoHost.connected;
     }
-    if (msgNeedRefresh) {
+    if (msgNeedRefresh)
+    {
       drawStatusScreenMsg();
     }
     scrollMsg();

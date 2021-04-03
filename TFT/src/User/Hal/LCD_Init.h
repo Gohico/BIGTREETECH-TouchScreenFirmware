@@ -1,23 +1,26 @@
 #ifndef _LCD_INIT_H_
 #define _LCD_INIT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "variants.h"
 #include "menu.h"
 
 #ifdef LCD_LED_PWM_CHANNEL
-  #define LCD_0_PERCENT    0
-  #define LCD_5_PERCENT    5
-  #define LCD_10_PERCENT   10
-  #define LCD_20_PERCENT   20
-  #define LCD_30_PERCENT   30
-  #define LCD_40_PERCENT   40
-  #define LCD_50_PERCENT   50
-  #define LCD_60_PERCENT   60
-  #define LCD_70_PERCENT   70
-  #define LCD_80_PERCENT   80
-  #define LCD_90_PERCENT   90
-  #define LCD_100_PERCENT  100
+  #define LCD_0_PERCENT   0
+  #define LCD_5_PERCENT   5
+  #define LCD_10_PERCENT  10
+  #define LCD_20_PERCENT  20
+  #define LCD_30_PERCENT  30
+  #define LCD_40_PERCENT  40
+  #define LCD_50_PERCENT  50
+  #define LCD_60_PERCENT  60
+  #define LCD_70_PERCENT  70
+  #define LCD_80_PERCENT  80
+  #define LCD_90_PERCENT  90
+  #define LCD_100_PERCENT 100
 
   #define LCD_DIM_OFF         0    // Off
   #define LCD_DIM_5_SECONDS   5    // Seconds
@@ -56,7 +59,7 @@
 #else
   #define wakeLCD()
 
-#endif // LCD_LED_PWM_CHANNEL
+#endif  // LCD_LED_PWM_CHANNEL
 
 #if LCD_DATA_16BIT == 1
   #define LCD_WR_16BITS_DATA(c) do{ LCD_WR_DATA(c); }while(0)
@@ -64,6 +67,12 @@
   #define LCD_WR_16BITS_DATA(c) do{ LCD_WR_DATA(((c)>>8)&0xFF); LCD_WR_DATA((c)&0xFF); }while(0)
 #endif
 
+uint32_t LCD_ReadPixel_24Bit(int16_t x, int16_t y);
 void LCD_RefreshDirection(void);
 void LCD_Init(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

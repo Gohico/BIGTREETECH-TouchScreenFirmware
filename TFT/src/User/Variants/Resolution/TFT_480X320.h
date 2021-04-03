@@ -33,16 +33,23 @@
 #define SMALLICON_HEIGHT  55
 
 // Status screen menu
+#define SSICON_COUNT              4
+#define SSICON_WIDTH              ICON_WIDTH
+#define SSICON_HEIGHT             ICON_HEIGHT
 #define SSICON_VAL_Y0             75
+#define SSICON_VAL_COLOR          BLACK
 #define SSICON_NAME_Y0            7
+#define SSICON_NAME_COLOR         WHITE
 #define STATUS_MSG_ICON_XOFFSET   5
 #define STATUS_MSG_ICON_YOFFSET   5
 #define STATUS_MSG_TITLE_XOFFSET  5
 #define STATUS_MSG_BODY_XOFFSET   0
 #define STATUS_MSG_BODY_YOFFSET   59
 #define STATUS_MSG_BODY_BOTTOM    6
-#define STATUS_TITLE_SHORT        20
 #define STATUS_GANTRY_YOFFSET     6
+
+#define NAME_LARGE_FONT           false
+#define VAL_LARGE_FONT            false
 
 //Heating Menu
 #define PREHEAT_TITLE_Y   4
@@ -54,7 +61,8 @@
 #define PICON_SM_WIDTH     121
 #define PICON_HEIGHT       50
 #define PICON_SPACE_X      ((LCD_WIDTH - PICON_LG_WIDTH*2 - PICON_SM_WIDTH - SPACE_X )/2)
-#define PICON_SPACE_Y      (ICON_HEIGHT + SPACE_Y - PICON_HEIGHT*2)/2
+#define PICON_SPACE_Y      (ICON_HEIGHT + SPACE_Y - PICON_HEIGHT*2)/4
+#define PICON_START_Y      (TITLE_END_Y+5)
 #define PICON_TITLE_X      52
 #define PICON_TITLE_Y      1
 #define PICON_VAL_X        PICON_TITLE_X
