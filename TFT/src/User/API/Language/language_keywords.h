@@ -354,6 +354,19 @@ extern "C" {
 #define LANG_KEY_Z_ALIGN                      "label_z_align:"
 #define LANG_KEY_MACROS                       "label_macros:"
 
+//custom
+#define LANG_KEY_POS                        "label_pos:"
+#define LANG_KEY_JOBSETUP                   "label_jobsetup:"
+#define LANG_KEY_ROTATE                     "label_rotate:"
+#define LANG_KEY_HOME_X                     "label_home_x:"
+#define LANG_KEY_HOME_Y                     "label_home_y:"
+#define LANG_KEY_HOME_Z                     "label_home_z:"
+#define LANG_KEY_HOME_ALL                   "label_home_all:"
+#define LANG_KEY_300_SECONDS                "label_300_seconds:"
+#define LANG_KEY_CUSTOM_SECONDS             "label_custom_seconds:"
+#define LANG_KEY_HOME_ALL                   "label_home_all:"
+
+
 #ifdef __cplusplus
 }
 #endif

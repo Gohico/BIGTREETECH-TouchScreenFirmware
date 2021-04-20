@@ -347,4 +347,15 @@
     #define STRING_Z_ALIGN                "Z Align"
     #define STRING_MACROS                 "Macros"
 
+    #define STRING_POS                      "PoS"
+    #define STRING_JOBSETUP                 "Job setup"
+    #define STRING_ROTATE                   "Rotate"
+    #define STRING_HOME_X                   "X = 0"
+    #define STRING_HOME_Y                   "Y = 0"
+    #define STRING_HOME_Z                   "Z = 0"
+    #define STRING_HOME_ALL                 "XYZ = 0"
+    #define STRING_300_SECONDS              "5 Min."
+    #define STRING_CUSTOM_SECONDS           "Custom"
+    #define STRING_PRINT                    "CNC"
+
 #endif
